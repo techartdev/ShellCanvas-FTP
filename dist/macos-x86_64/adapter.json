@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "id": "dev.shellcanvas.ftp",
+  "name": "FTP files",
+  "version": "0.1.0",
+  "description": "Browse and download files over explicit FTPS or FTP. Upload and file changes are not available.",
+  "platform": "macos-x86_64",
+  "entrypoint": "bin/shellcanvas-ftp",
+  "arguments": [],
+  "files": [
+    {
+      "path": "bin/shellcanvas-ftp",
+      "size": 3622480,
+      "sha256": "eebf9760d43981cdf5ba87f37f3f90d26e2df2bd0c10fde45308eacdc3185756",
+      "executable": true
+    }
+  ],
+  "configuration": [
+    {
+      "id": "host",
+      "label": "FTP server",
+      "kind": "text",
+      "required": true,
+      "default": null
+    },
+    {
+      "id": "port",
+      "label": "Port",
+      "kind": "number",
+      "required": true,
+      "default": 21
+    },
+    {
+      "id": "username",
+      "label": "Username",
+      "kind": "text",
+      "required": true,
+      "default": null
+    },
+    {
+      "id": "password",
+      "label": "Password",
+      "kind": "password",
+      "required": true,
+      "default": null
+    },
+    {
+      "id": "tls",
+      "label": "Use explicit FTPS (TLS)",
+      "kind": "boolean",
+      "required": false,
+      "default": true
+    },
+    {
+      "id": "trustCertificate",
+      "label": "Trust self-signed FTPS certificate",
+      "kind": "boolean",
+      "required": false,
+      "default": false
+    }
+  ]
+}
