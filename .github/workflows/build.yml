@@ -1,0 +1,73 @@
+name: Build adapters
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-latest
+            platform: windows-x86_64
+            executable: shellcanvas-ftp.exe
+          - runner: ubuntu-latest
+            platform: linux-x86_64
+            executable: shellcanvas-ftp
+          - runner: macos-15-intel
+            platform: macos-x86_64
+            executable: shellcanvas-ftp
+          - runner: macos-latest
+            platform: macos-aarch64
+            executable: shellcanvas-ftp
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test adapter
+        run: cargo test --locked
+      - name: Build adapter and packaging tool
+        run: |
+          cargo build --release --locked
+          cargo build --release --locked --bin shellcanvas-adapter -p shellcanvas-adapter-sdk
+      - name: Package and validate
+        shell: bash
+        run: |
+          mkdir -p dist
+          ./target/release/shellcanvas-adapter${{ runner.os == 'Windows' && '.exe' || '' }} pack adapter.source.json ./target/release/${{ matrix.executable }} dist/${{ matrix.platform }}
+          ./target/release/shellcanvas-adapter${{ runner.os == 'Windows' && '.exe' || '' }} validate dist/${{ matrix.platform }}/adapter.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ftp-${{ matrix.platform }}
+          path: dist/${{ matrix.platform }}/
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ftp-*
+          path: artifacts
+      - name: Archive packages
+        shell: bash
+        run: |
+          mkdir -p release
+          for package in artifacts/ftp-*; do
+            platform="${package#artifacts/ftp-}"
+            (cd "$package" && zip -q -r "${GITHUB_WORKSPACE}/release/shellcanvas-ftp-${platform}.zip" .)
+          done
+      - name: Publish preview release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" release/*.zip --title "ShellCanvas FTP ${GITHUB_REF_NAME}" --notes "Read-only FTP/explicit FTPS Files adapter. Supports browsing, text preview, and file download. Upload and file changes are not available in this preview." --prerelease
