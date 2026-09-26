@@ -39,13 +39,13 @@ jobs:
       - name: Package and validate
         shell: bash
         run: |
-          mkdir -p dist
-          ./target/release/shellcanvas-adapter${{ runner.os == 'Windows' && '.exe' || '' }} pack adapter.source.json ./target/release/${{ matrix.executable }} dist/${{ matrix.platform }}
-          ./target/release/shellcanvas-adapter${{ runner.os == 'Windows' && '.exe' || '' }} validate dist/${{ matrix.platform }}/adapter.json
+          mkdir -p .build-packages
+          ./target/release/shellcanvas-adapter${{ runner.os == 'Windows' && '.exe' || '' }} pack adapter.source.json ./target/release/${{ matrix.executable }} .build-packages/${{ matrix.platform }}
+          ./target/release/shellcanvas-adapter${{ runner.os == 'Windows' && '.exe' || '' }} validate .build-packages/${{ matrix.platform }}/adapter.json
       - uses: actions/upload-artifact@v4
         with:
           name: ftp-${{ matrix.platform }}
-          path: dist/${{ matrix.platform }}/
+          path: .build-packages/${{ matrix.platform }}/
           if-no-files-found: error
 
   release:

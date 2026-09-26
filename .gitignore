@@ -1,3 +1,4 @@
 /target/
 /.artifacts/
+/.build-packages/
 /.testdeps/
