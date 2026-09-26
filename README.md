@@ -2,6 +2,8 @@
 
 This independent connection adapter gives ShellCanvas a read-only Files source for FTP servers. It supports folder browsing, small UTF-8 previews and text reads, and binary file downloads. Upload, rename, deletion, editing and folder transfers are not advertised. It does not use an SSH connection or SSH credentials.
 
+Download the [v0.1.0 preview package](https://github.com/techartdev/ShellCanvas-FTP/releases/tag/v0.1.0) for your platform, extract it, and select `adapter.json` under **App Manager > Connection adapters > Install adapter**. Review the native-code request before installing. ShellCanvas PR #34 also adds a suggested FTP entry that fetches the same version directly.
+
 The default is explicit FTPS with normal server certificate validation. **Trust self-signed FTPS certificate** is an explicit exception for servers you already trust. Uncheck **Use explicit FTPS (TLS)** only when you knowingly need plain FTP. Plain FTP sends credentials and data without encryption. If the server supports only implicit FTPS, this adapter cannot connect yet.
 
 Build and package on the target platform:
